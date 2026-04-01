@@ -1,0 +1,404 @@
+<!-- ================================================
+     matiere.html — Study Buddy
+     Vue d'une matière — injectée par le router SPA
+     Personnalisée dynamiquement selon params.matiere
+     ================================================ -->
+
+<!-- ------------------------------------------------
+     1. HEADER MATIÈRE (couleur dynamique)
+     ------------------------------------------------ -->
+<div class="matiere-accent-bar" id="matiere-accent-bar"></div>
+
+<div class="matiere-header" id="matiere-header">
+  <div class="matiere-header__left">
+    <span class="matiere-header__emoji" id="matiere-emoji" aria-hidden="true">📐</span>
+    <h1 class="matiere-header__nom" id="matiere-nom">Maths</h1>
+    <p class="matiere-header__sous-titre" id="matiere-sous-titre">Révision Brevet 3ème</p>
+  </div>
+  <button class="matiere-header__retour" onclick="naviguer('dashboard')" aria-label="Retour à l'accueil">
+    ← Accueil
+  </button>
+</div>
+
+<!-- ------------------------------------------------
+     2. BOUTONS DE MODE
+     ------------------------------------------------ -->
+<section class="modes-section" aria-labelledby="titre-modes">
+  <h2 class="modes-section__titre" id="titre-modes">Comment veux-tu réviser ?</h2>
+
+  <div class="modes-grid" role="list">
+
+    <!-- Mode Révision -->
+    <div
+      class="mode-card"
+      role="listitem"
+      tabindex="0"
+      id="mode-revision"
+      onclick="lancerMode('revision')"
+      onkeydown="if(event.key==='Enter'||event.key===' ') lancerMode('revision')"
+      aria-label="Mode révision"
+    >
+      <span class="mode-card__icon" aria-hidden="true">📖</span>
+      <span class="mode-card__label">Révision</span>
+      <span class="mode-card__desc">Questions mélangées, prends ton temps</span>
+    </div>
+
+    <!-- Mode Entraînement -->
+    <div
+      class="mode-card"
+      role="listitem"
+      tabindex="0"
+      id="mode-entrainement"
+      onclick="lancerMode('entrainement')"
+      onkeydown="if(event.key==='Enter'||event.key===' ') lancerMode('entrainement')"
+      aria-label="Mode entraînement"
+    >
+      <span class="mode-card__icon" aria-hidden="true">🎯</span>
+      <span class="mode-card__label">Entraînement</span>
+      <span class="mode-card__desc">Focus sur tes erreurs passées</span>
+    </div>
+
+    <!-- Mode Défi Chrono -->
+    <div
+      class="mode-card mode-card--chrono"
+      role="listitem"
+      tabindex="0"
+      id="mode-chrono"
+      onclick="lancerMode('chrono')"
+      onkeydown="if(event.key==='Enter'||event.key===' ') lancerMode('chrono')"
+      aria-label="Mode défi chrono — XP x1.5"
+    >
+      <span class="mode-card__xp-badge" aria-label="Bonus XP x1.5">x1.5 XP</span>
+      <span class="mode-card__icon" aria-hidden="true">⚡</span>
+      <span class="mode-card__label">Défi Chrono</span>
+      <span class="mode-card__desc">60s par question, XP boosté</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ------------------------------------------------
+     3. STATS DE LA MATIÈRE
+     ------------------------------------------------ -->
+<section class="matiere-stats" aria-labelledby="titre-stats">
+  <h2 class="matiere-stats__titre" id="titre-stats">Mes statistiques</h2>
+
+  <div class="stats-row" role="list">
+    <div class="stat-block" role="listitem">
+      <span class="stat-block__valeur" id="stat-score">0%</span>
+      <span class="stat-block__label">Score moyen</span>
+    </div>
+    <div class="stat-block" role="listitem">
+      <span class="stat-block__valeur" id="stat-questions">0</span>
+      <span class="stat-block__label">Questions vues</span>
+    </div>
+    <div class="stat-block" role="listitem">
+      <span class="stat-block__valeur" id="stat-streak">0🔥</span>
+      <span class="stat-block__label">Streak</span>
+    </div>
+  </div>
+</section>
+
+<!-- ------------------------------------------------
+     4. ACCORDÉON CHAPITRES
+     ------------------------------------------------ -->
+<section class="chapitres-section" aria-labelledby="titre-chapitres">
+  <h2 class="chapitres-section__titre" id="titre-chapitres">Chapitres</h2>
+
+  <div class="chapitres-liste" id="chapitres-liste" role="list">
+    <!-- Injecté dynamiquement par le script -->
+    <div class="chapitres-vide" aria-live="polite">
+      <span aria-hidden="true">⏳</span> Chargement des chapitres...
+    </div>
+  </div>
+</section>
+
+<!-- ------------------------------------------------
+     5. MES ERREURS
+     ------------------------------------------------ -->
+<section class="erreurs-section" aria-labelledby="titre-erreurs">
+  <h2 class="erreurs-section__titre" id="titre-erreurs">
+    Mes erreurs à retravailler
+    <span class="erreurs-section__badge" id="erreurs-badge" aria-label="Nombre d'erreurs">0</span>
+  </h2>
+
+  <div class="erreurs-liste" id="erreurs-liste" role="list" aria-live="polite">
+    <!-- Injecté dynamiquement -->
+  </div>
+
+  <div class="erreurs-vide hidden" id="erreurs-vide">
+    <span aria-hidden="true">🎉</span> Aucune erreur enregistrée — continue comme ça !
+  </div>
+</section>
+
+<!-- ------------------------------------------------
+     6. SCRIPT D'INITIALISATION DE LA VUE MATIÈRE
+     ------------------------------------------------ -->
+<script>
+(function () {
+
+  /* ---- CONFIG DES MATIÈRES ---- */
+  const CONFIG_MATIERES = {
+    'maths': {
+      nom:        'Maths',
+      emoji:      '📐',
+      couleur:    '#2563EB',
+      variable:   '--color-maths',
+      fichierData: 'data/maths.json',
+      chapitres: [
+        { id: 'thales',           label: 'Théorème de Thalès'    },
+        { id: 'fonctions',        label: 'Fonctions'              },
+        { id: 'nombres_premiers', label: 'Nombres premiers'       },
+        { id: 'transformations',  label: 'Transformations géom.'  },
+        { id: 'pythagore',        label: 'Pythagore'              },
+        { id: 'equations',        label: 'Équations 1er degré'    },
+        { id: 'fractions',        label: 'Fractions'              },
+        { id: 'trigonometrie',    label: 'Trigonométrie'          },
+        { id: 'probabilites',     label: 'Probabilités'           },
+        { id: 'statistiques',     label: 'Médiane & Étendue'      },
+      ],
+    },
+    'histoire-geo': {
+      nom:        'Histoire-Géo',
+      emoji:      '🗺️',
+      couleur:    '#DC2626',
+      variable:   '--color-histoire',
+      fichierData: 'data/histoire-geo.json',
+      chapitres: [
+        { id: 'ww1',                  label: 'Première Guerre mondiale' },
+        { id: 'revolutions_russes',   label: 'Révolutions russes'       },
+        { id: 'totalitarismes',       label: 'Totalitarismes'           },
+        { id: 'ww2',                  label: 'Seconde Guerre mondiale'  },
+        { id: 'france_ww2',           label: 'La France dans la WW2'    },
+        { id: 'france_villes',        label: 'France : villes & espaces'},
+        { id: 'republique_democratie',label: 'République & Démocratie'  },
+      ],
+    },
+    'physique-chimie': {
+      nom:        'Physique-Chimie',
+      emoji:      '⚗️',
+      couleur:    '#D97706',
+      variable:   '--color-physique',
+      fichierData: 'data/physique-chimie.json',
+      chapitres: [
+        { id: 'transformations_chimiques', label: 'Transformations chimiques' },
+        { id: 'atomes',                    label: 'Les atomes'                },
+        { id: 'ions',                      label: 'Les ions'                  },
+        { id: 'ph_solutions',              label: 'pH et solutions'           },
+        { id: 'energie_sources',           label: 'Formes & sources d\'énergie' },
+        { id: 'energie_electrique',        label: 'Énergie électrique E=P×t' },
+        { id: 'univers',                   label: 'L\'Univers'                },
+        { id: 'lumiere',                   label: 'La lumière'                },
+      ],
+    },
+    'svt': {
+      nom:        'SVT',
+      emoji:      '🌿',
+      couleur:    '#16A34A',
+      variable:   '--color-svt',
+      fichierData: 'data/svt.json',
+      chapitres: [
+        { id: 'volcanisme',              label: 'Le volcanisme'               },
+        { id: 'seismes',                 label: 'Les séismes'                 },
+        { id: 'plaques_tectoniques',     label: 'Plaques tectoniques'         },
+        { id: 'corps_humain',            label: 'Corps humain & effort'       },
+        { id: 'digestion_alimentation',  label: 'Digestion & alimentation'    },
+        { id: 'microbes_sante',          label: 'Microbes & santé'            },
+        { id: 'reproduction_genetique',  label: 'Reproduction & génétique'    },
+        { id: 'ressources_naturelles',   label: 'Ressources naturelles'       },
+      ],
+    },
+  };
+
+  /* ---- LECTURE DES PARAMS ---- */
+  const params  = window.routerState ? window.routerState.params : {};
+  const matiere = params.matiere || 'maths';
+  const config  = CONFIG_MATIERES[matiere] || CONFIG_MATIERES['maths'];
+
+  /* ---- APPLIQUER COULEUR MATIÈRE ---- */
+  document.documentElement.style.setProperty('--matiere-color', config.couleur);
+  const accentBar = document.getElementById('matiere-accent-bar');
+  if (accentBar) accentBar.style.background = config.couleur;
+
+  /* ---- HEADER MATIÈRE ---- */
+  const elEmoji    = document.getElementById('matiere-emoji');
+  const elNom      = document.getElementById('matiere-nom');
+  const elSousTitre = document.getElementById('matiere-sous-titre');
+
+  if (elEmoji)    elEmoji.textContent    = config.emoji;
+  if (elNom)      elNom.textContent      = config.nom;
+  if (elSousTitre) elSousTitre.textContent = `Révision Brevet 3ème`;
+
+  /* Titre de la page */
+  document.title = `${config.nom} — Study Buddy`;
+
+  /* ---- STATS ---- */
+  const prog = Storage.getProgression(matiere);
+  const profil = Storage.getProfil();
+
+  if (prog) {
+    const elScore = document.getElementById('stat-score');
+    const elQuestions = document.getElementById('stat-questions');
+    const elStreak = document.getElementById('stat-streak');
+
+    if (elScore)     elScore.textContent     = `${prog.score_global || 0}%`;
+    if (elQuestions) elQuestions.textContent  = prog.questions_vues.length || 0;
+    if (elStreak)    elStreak.textContent     = `${profil.streak_jours || 0}🔥`;
+  }
+
+  /* ---- CHAPITRES ACCORDÉON ---- */
+  const elChapitres = document.getElementById('chapitres-liste');
+
+  if (config.chapitres.length === 0) {
+    elChapitres.innerHTML = `
+      <div class="chapitres-vide">
+        <span aria-hidden="true">🚧</span> Chapitres disponibles prochainement.
+      </div>
+    `;
+  } else {
+    const chapProgression = prog ? prog.chapitres : {};
+
+    elChapitres.innerHTML = config.chapitres.map((chap) => {
+      const chapStats = chapProgression[chap.id] || { score: 0, questions_vues: 0 };
+      const score     = chapStats.score || 0;
+      const qVues     = chapStats.questions_vues || 0;
+
+      return `
+        <div class="chapitre-item" role="listitem">
+          <div
+            class="chapitre-header"
+            tabindex="0"
+            role="button"
+            aria-expanded="false"
+            aria-controls="body-${chap.id}"
+            onclick="toggleChapitre(this)"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); toggleChapitre(this);}"
+          >
+            <div class="chapitre-info">
+              <span class="chapitre-nom">${chap.label}</span>
+              <div class="chapitre-score-bar-wrapper" role="progressbar" aria-valuenow="${score}" aria-valuemin="0" aria-valuemax="100" aria-label="Score ${chap.label} : ${score}%">
+                <div class="chapitre-score-bar" style="width: ${score}%;"></div>
+              </div>
+            </div>
+            <span class="chapitre-score-label" aria-hidden="true">${score}%</span>
+            <span class="chapitre-chevron" aria-hidden="true">▼</span>
+          </div>
+
+          <div class="chapitre-body" id="body-${chap.id}" role="region" aria-label="Détails ${chap.label}">
+            <div class="chapitre-stats-mini">
+              <p>Questions vues : <strong>${qVues}</strong></p>
+              <p>Score : <strong>${score}%</strong></p>
+            </div>
+            <div class="chapitre-actions">
+              <button
+                class="btn btn--secondary btn--sm"
+                onclick="lancerChapitre('${chap.id}', 'revision')"
+                aria-label="Réviser ${chap.label}"
+              >Réviser</button>
+              <button
+                class="btn btn--primary btn--sm"
+                onclick="lancerChapitre('${chap.id}', 'entrainement')"
+                aria-label="Revoir les erreurs de ${chap.label}"
+              >Revoir erreurs</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /* ---- ERREURS À RETRAVAILLER ---- */
+  const elErreursListe = document.getElementById('erreurs-liste');
+  const elErreursVide  = document.getElementById('erreurs-vide');
+  const elErreursBadge = document.getElementById('erreurs-badge');
+
+  const idsRatees = prog ? prog.questions_ratees : [];
+  if (elErreursBadge) elErreursBadge.textContent = idsRatees.length;
+
+  if (idsRatees.length === 0) {
+    if (elErreursListe) elErreursListe.style.display = 'none';
+    if (elErreursVide)  elErreursVide.classList.remove('hidden');
+  } else {
+    if (elErreursVide) elErreursVide.classList.add('hidden');
+
+    /* Charger les questions ratées depuis le JSON */
+    fetch(config.fichierData)
+      .then(r => r.json())
+      .then(data => {
+        const questionsRatees = data.filter(q => idsRatees.includes(q.id)).slice(0, 8);
+
+        if (elErreursListe) {
+          elErreursListe.innerHTML = questionsRatees.map(q => `
+            <div class="erreur-item" role="listitem">
+              <div>
+                <p class="erreur-item__enonce">${q.enonce || q.recto || 'Question sans énoncé'}</p>
+                <p class="erreur-item__chapitre">${q.chapitre || ''}</p>
+              </div>
+              <button
+                class="btn btn--ghost btn--sm"
+                onclick="lancerChapitre('${q.chapitre}', 'entrainement')"
+                aria-label="Retravailler ce chapitre"
+              >Retravailler</button>
+            </div>
+          `).join('');
+        }
+      })
+      .catch(() => {
+        if (elErreursListe) {
+          elErreursListe.innerHTML = `
+            <div class="erreur-item" role="listitem">
+              <p class="erreur-item__enonce">${idsRatees.length} questions à retravailler</p>
+              <button class="btn btn--primary btn--sm" onclick="lancerMode('entrainement')">Réviser</button>
+            </div>
+          `;
+        }
+      });
+  }
+
+  /* ------------------------------------------------
+     FONCTIONS GLOBALES (appelées depuis les onclick)
+     ------------------------------------------------ */
+
+  /**
+   * Ouvre/ferme un chapitre de l'accordéon.
+   */
+  window.toggleChapitre = function(headerEl) {
+    const item    = headerEl.closest('.chapitre-item');
+    const isOpen  = item.classList.contains('open');
+
+    /* Fermer tous les chapitres ouverts */
+    document.querySelectorAll('.chapitre-item.open').forEach(el => {
+      el.classList.remove('open');
+      el.querySelector('.chapitre-header').setAttribute('aria-expanded', 'false');
+    });
+
+    /* Ouvrir celui-ci si pas déjà ouvert */
+    if (!isOpen) {
+      item.classList.add('open');
+      headerEl.setAttribute('aria-expanded', 'true');
+    }
+  };
+
+  /**
+   * Lance un quiz sur un chapitre précis.
+   */
+  window.lancerChapitre = function(chapitreId, mode) {
+    naviguer('quiz', {
+      matiere:  matiere,
+      chapitre: chapitreId,
+      mode:     mode || 'revision',
+    });
+  };
+
+  /**
+   * Lance un quiz sur toute la matière dans un mode donné.
+   */
+  window.lancerMode = function(mode) {
+    naviguer('quiz', {
+      matiere: matiere,
+      mode:    mode,
+    });
+  };
+
+})();
+</script>

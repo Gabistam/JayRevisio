@@ -1,0 +1,21 @@
+<!-- ================================================
+     resultats.html — Study Jay
+     Vue résultats de session (fallback si QuizEngine
+     n'a pas injecté les résultats inline dans #quiz-zone)
+     En pratique, QuizEngine._finSession() injecte les
+     résultats directement dans la zone quiz.
+     Cette page sert de fallback de navigation directe.
+     ================================================ -->
+
+<div class="resultats-page">
+  <div class="empty-state">
+    <span class="empty-state__icon" aria-hidden="true">🏁</span>
+    <p class="empty-state__text">
+      Session terminée !<br>
+      Retourne à l'accueil pour voir tes progrès.
+    </p>
+    <button class="btn btn--primary mt-4" onclick="naviguer('dashboard')">
+      🏠 Retour à l'accueil
+    </button>
+  </div>
+</div>

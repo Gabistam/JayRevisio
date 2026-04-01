@@ -1,0 +1,487 @@
+<!-- ================================================
+     dashboard.html — Study Jay
+     Vue accueil — injectée par le router SPA
+     Données mockées pour le Sprint 1
+     ================================================ -->
+
+<!-- ------------------------------------------------
+     1. BANDEAU COMPTE À REBOURS BREVET
+     ------------------------------------------------ -->
+<div class="brevet-banner" id="brevet-banner" role="region" aria-label="Compte à rebours Brevet">
+  <div class="brevet-banner__left">
+    <span class="brevet-banner__icon" aria-hidden="true">🎓</span>
+    <div class="brevet-banner__text">
+      <span class="brevet-banner__titre">Brevet dans</span>
+      <span class="brevet-banner__jours" id="brevet-jours">79 jours</span>
+      <span class="brevet-banner__date" id="brevet-date">19 juin 2026</span>
+    </div>
+  </div>
+
+  <div class="brevet-banner__progress" aria-hidden="true">
+    <span class="brevet-banner__progress-label">Progression annuelle</span>
+    <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="40% de l'année écoulée">
+      <div class="progress-bar__fill" style="width: 40%; background: linear-gradient(90deg, #7C3AED, #a855f7);"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------
+     2. STREAK DU JOUR
+     ------------------------------------------------ -->
+<div class="streak-banner" aria-label="Série de jours consécutifs">
+  <span class="streak-banner__icon" aria-hidden="true">🔥</span>
+  <p class="streak-banner__text">
+    Série en cours :
+    <span class="streak-banner__count" id="streak-count">0 jour</span>
+    — Reviens demain pour continuer !
+  </p>
+</div>
+
+<!-- ------------------------------------------------
+     3. GRILLE DES 4 MATIÈRES
+     ------------------------------------------------ -->
+<section aria-labelledby="titre-matieres">
+  <h2 class="section-title" id="titre-matieres">
+    <span class="title-icon" aria-hidden="true">📖</span>
+    Mes matières
+  </h2>
+
+  <div class="matieres-grid" role="list">
+
+    <!-- MATHS -->
+    <article
+      class="matiere-card matiere-card--maths"
+      role="listitem"
+      tabindex="0"
+      aria-label="Mathématiques — Score 0%"
+      onclick="naviguer('matiere', { matiere: 'maths' })"
+      onkeydown="if(event.key==='Enter'||event.key===' ') naviguer('matiere', { matiere: 'maths' })"
+    >
+      <div class="matiere-card__header">
+        <span class="matiere-card__icon" aria-hidden="true">📐</span>
+        <span class="matiere-card__nom">Maths</span>
+      </div>
+
+      <div class="matiere-card__score">
+        <span class="matiere-card__score-pct">0%</span>
+        <span class="matiere-card__score-label">score global</span>
+      </div>
+
+      <div class="matiere-card__progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Score Maths : 0%">
+          <div class="progress-bar__fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <p class="matiere-card__session">
+        <span>Aucune session</span>
+      </p>
+
+      <button class="matiere-card__btn" tabindex="-1" aria-hidden="true">
+        Réviser →
+      </button>
+    </article>
+
+    <!-- HISTOIRE-GÉO -->
+    <article
+      class="matiere-card matiere-card--histoire"
+      role="listitem"
+      tabindex="0"
+      aria-label="Histoire-Géographie — Score 0%"
+      onclick="naviguer('matiere', { matiere: 'histoire-geo' })"
+      onkeydown="if(event.key==='Enter'||event.key===' ') naviguer('matiere', { matiere: 'histoire-geo' })"
+    >
+      <div class="matiere-card__header">
+        <span class="matiere-card__icon" aria-hidden="true">🗺️</span>
+        <span class="matiere-card__nom">Histoire-Géo</span>
+      </div>
+
+      <div class="matiere-card__score">
+        <span class="matiere-card__score-pct">0%</span>
+        <span class="matiere-card__score-label">score global</span>
+      </div>
+
+      <div class="matiere-card__progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Score Histoire : 0%">
+          <div class="progress-bar__fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <p class="matiere-card__session">
+        <span>Aucune session</span>
+      </p>
+
+      <button class="matiere-card__btn" tabindex="-1" aria-hidden="true">
+        Réviser →
+      </button>
+    </article>
+
+    <!-- PHYSIQUE-CHIMIE -->
+    <article
+      class="matiere-card matiere-card--physique"
+      role="listitem"
+      tabindex="0"
+      aria-label="Physique-Chimie — Score 0%"
+      onclick="naviguer('matiere', { matiere: 'physique-chimie' })"
+      onkeydown="if(event.key==='Enter'||event.key===' ') naviguer('matiere', { matiere: 'physique-chimie' })"
+    >
+      <div class="matiere-card__header">
+        <span class="matiere-card__icon" aria-hidden="true">⚗️</span>
+        <span class="matiere-card__nom">Physique-Chimie</span>
+      </div>
+
+      <div class="matiere-card__score">
+        <span class="matiere-card__score-pct">0%</span>
+        <span class="matiere-card__score-label">score global</span>
+      </div>
+
+      <div class="matiere-card__progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Score Physique : 0%">
+          <div class="progress-bar__fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <p class="matiere-card__session">
+        <span>Aucune session</span>
+      </p>
+
+      <button class="matiere-card__btn" tabindex="-1" aria-hidden="true">
+        Réviser →
+      </button>
+    </article>
+
+    <!-- SVT -->
+    <article
+      class="matiere-card matiere-card--svt"
+      role="listitem"
+      tabindex="0"
+      aria-label="SVT — Score 0%"
+      onclick="naviguer('matiere', { matiere: 'svt' })"
+      onkeydown="if(event.key==='Enter'||event.key===' ') naviguer('matiere', { matiere: 'svt' })"
+    >
+      <div class="matiere-card__header">
+        <span class="matiere-card__icon" aria-hidden="true">🌿</span>
+        <span class="matiere-card__nom">SVT</span>
+      </div>
+
+      <div class="matiere-card__score">
+        <span class="matiere-card__score-pct">0%</span>
+        <span class="matiere-card__score-label">score global</span>
+      </div>
+
+      <div class="matiere-card__progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Score SVT : 0%">
+          <div class="progress-bar__fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <p class="matiere-card__session">
+        <span>Aucune session</span>
+      </p>
+
+      <button class="matiere-card__btn" tabindex="-1" aria-hidden="true">
+        Réviser →
+      </button>
+    </article>
+
+  </div>
+</section>
+
+<!-- ------------------------------------------------
+     4. DÉFI DU JOUR
+     ------------------------------------------------ -->
+<section class="defi-du-jour" aria-labelledby="titre-defi">
+  <div class="defi-du-jour__header">
+    <h2 class="defi-du-jour__titre" id="titre-defi">
+      <span aria-hidden="true">⚡</span>
+      Défi du jour
+    </h2>
+    <span class="defi-du-jour__xp">+50 XP</span>
+  </div>
+
+  <p class="defi-du-jour__enonce" id="defi-enonce">
+    <!-- Mockup : sera généré dynamiquement au Sprint 6 -->
+    Triangle ABC rectangle en B. AB = 6 cm et BC = 8 cm.<br />
+    Calcule la longueur AC. (Pythagore)
+  </p>
+
+  <div class="defi-du-jour__actions">
+    <button
+      class="btn btn--primary"
+      onclick="naviguer('quiz', { mode: 'defi', source: 'defi-du-jour' })"
+    >
+      ⚡ Relever le défi
+    </button>
+    <button class="btn btn--ghost btn--sm" id="btn-passer-defi">
+      Passer
+    </button>
+  </div>
+</section>
+
+<!-- ------------------------------------------------
+     5. POINTS FAIBLES
+     ------------------------------------------------ -->
+<section class="points-faibles" aria-labelledby="titre-faibles">
+  <h2 class="section-title" id="titre-faibles">
+    <span class="title-icon" aria-hidden="true">🎯</span>
+    Points à retravailler
+  </h2>
+
+  <!-- État vide (affiché quand aucune donnée) -->
+  <div class="faible-list" id="faibles-list" role="list">
+
+    <!-- Mockup : sera remplacé par les vraies données au Sprint 2 -->
+    <!-- Exemple avec données mockées pour visualiser le rendu -->
+    <div class="faible-item" role="listitem">
+      <span class="faible-item__matiere-dot faible-item__matiere-dot--maths" aria-hidden="true"></span>
+      <div class="faible-item__info">
+        <p class="faible-item__chapitre">Trigonométrie</p>
+        <p class="faible-item__matiere-label">Maths</p>
+      </div>
+      <span class="faible-item__score">32%</span>
+      <button
+        class="faible-item__btn"
+        onclick="naviguer('matiere', { matiere: 'maths' })"
+        aria-label="Retravailler la trigonométrie"
+      >
+        Retravailler
+      </button>
+    </div>
+
+    <div class="faible-item" role="listitem">
+      <span class="faible-item__matiere-dot faible-item__matiere-dot--histoire" aria-hidden="true"></span>
+      <div class="faible-item__info">
+        <p class="faible-item__chapitre">Révolutions russes</p>
+        <p class="faible-item__matiere-label">Histoire-Géo</p>
+      </div>
+      <span class="faible-item__score">28%</span>
+      <button
+        class="faible-item__btn"
+        onclick="naviguer('matiere', { matiere: 'histoire-geo' })"
+        aria-label="Retravailler les révolutions russes"
+      >
+        Retravailler
+      </button>
+    </div>
+
+    <div class="faible-item" role="listitem">
+      <span class="faible-item__matiere-dot faible-item__matiere-dot--physique" aria-hidden="true"></span>
+      <div class="faible-item__info">
+        <p class="faible-item__chapitre">Transformations chimiques</p>
+        <p class="faible-item__matiere-label">Physique-Chimie</p>
+      </div>
+      <span class="faible-item__score">41%</span>
+      <button
+        class="faible-item__btn"
+        onclick="naviguer('matiere', { matiere: 'physique-chimie' })"
+        aria-label="Retravailler les transformations chimiques"
+      >
+        Retravailler
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Message si aucun point faible -->
+  <div class="empty-state hidden" id="faibles-empty">
+    <span class="empty-state__icon" aria-hidden="true">🏆</span>
+    <p class="empty-state__text">
+      Aucun point faible détecté.<br />Continue comme ça !
+    </p>
+  </div>
+</section>
+
+<!-- ------------------------------------------------
+     6. DERNIERS BADGES
+     ------------------------------------------------ -->
+<section class="badges-section" aria-labelledby="titre-badges">
+  <h2 class="section-title" id="titre-badges">
+    <span class="title-icon" aria-hidden="true">🏅</span>
+    Badges
+  </h2>
+
+  <div class="badges-list" id="badges-list" role="list" aria-label="Badges débloqués et à débloquer">
+
+    <!-- Badges mockés — verrouillés au départ -->
+    <div class="badge-card badge-card--locked" role="listitem" aria-label="Badge Vegeta Mode — verrouillé">
+      <span class="badge-card__icon" aria-hidden="true">👑</span>
+      <span class="badge-card__nom">Vegeta Mode</span>
+      <span class="badge-card__desc">10 bonnes réponses d'affilée</span>
+    </div>
+
+    <div class="badge-card badge-card--locked" role="listitem" aria-label="Badge Gear 5 — verrouillé">
+      <span class="badge-card__icon" aria-hidden="true">⚙️</span>
+      <span class="badge-card__nom">Gear 5</span>
+      <span class="badge-card__desc">1ère session SVT complète</span>
+    </div>
+
+    <div class="badge-card badge-card--locked" role="listitem" aria-label="Badge Spider-Sense — verrouillé">
+      <span class="badge-card__icon" aria-hidden="true">🕷️</span>
+      <span class="badge-card__nom">Spider-Sense</span>
+      <span class="badge-card__desc">0 erreur sur une session</span>
+    </div>
+
+    <div class="badge-card badge-card--locked" role="listitem" aria-label="Badge Sniper Mbappé — verrouillé">
+      <span class="badge-card__icon" aria-hidden="true">⚽</span>
+      <span class="badge-card__nom">Sniper Mbappé</span>
+      <span class="badge-card__desc">5 défis chrono gagnés</span>
+    </div>
+
+    <div class="badge-card badge-card--locked" role="listitem" aria-label="Badge Wemby IQ — verrouillé">
+      <span class="badge-card__icon" aria-hidden="true">🏀</span>
+      <span class="badge-card__nom">Wemby IQ</span>
+      <span class="badge-card__desc">100 questions en histoire</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ------------------------------------------------
+     SCRIPT D'INITIALISATION DE LA VUE DASHBOARD
+     Branchée sur Storage et Gamification (Sprint 2)
+     ------------------------------------------------ -->
+<script>
+(function() {
+
+  /* ---- 1. COMPTE À REBOURS BREVET ---- */
+  const profil      = Storage.getProfil();
+  const dateBrevet  = profil.brevet_date || '2026-06-19';
+  const jours       = Utils.joursAvant(dateBrevet);
+
+  const elJours = document.getElementById('brevet-jours');
+  const elDate  = document.getElementById('brevet-date');
+  const banner  = document.getElementById('brevet-banner');
+
+  if (elJours) {
+    elJours.textContent = jours === 0
+      ? "C'est aujourd'hui !"
+      : `${jours} jour${jours > 1 ? 's' : ''}`;
+  }
+  if (elDate)  elDate.textContent = Utils.formaterDate(dateBrevet);
+  if (banner)  banner.setAttribute('aria-label', `Brevet dans ${jours} jours`);
+
+  /* ---- 2. STREAK ---- */
+  const elStreak = document.getElementById('streak-count');
+  if (elStreak) {
+    const streak = profil.streak_jours || 0;
+    elStreak.textContent = streak === 0
+      ? '0 jour'
+      : `${streak} jour${streak > 1 ? 's' : ''}`;
+  }
+
+  /* ---- 3. CARDS MATIÈRES — scores réels ---- */
+  const MATIERES = [
+    { id: 'maths',           label: 'Maths',          selector: '.matiere-card--maths'    },
+    { id: 'histoire-geo',    label: 'Histoire-Géo',   selector: '.matiere-card--histoire' },
+    { id: 'physique-chimie', label: 'Physique-Chimie',selector: '.matiere-card--physique' },
+    { id: 'svt',             label: 'SVT',             selector: '.matiere-card--svt'      },
+  ];
+
+  const historique = Storage.getHistorique();
+
+  for (const mat of MATIERES) {
+    const prog = Storage.getProgression(mat.id);
+    const card = document.querySelector(mat.selector);
+    if (!card || !prog) continue;
+
+    const score = prog.score_global || 0;
+
+    /* Score % */
+    const elPct = card.querySelector('.matiere-card__score-pct');
+    if (elPct) elPct.textContent = `${score}%`;
+
+    /* Barre de progression */
+    const elBar = card.querySelector('.progress-bar__fill');
+    if (elBar) {
+      elBar.style.width = `${score}%`;
+      const barContainer = card.querySelector('.progress-bar');
+      if (barContainer) barContainer.setAttribute('aria-valuenow', score);
+    }
+
+    /* Aria-label de la card */
+    card.setAttribute('aria-label', `${mat.label} — Score ${score}%`);
+
+    /* Dernière session */
+    const derniereSession = historique.find(s => s.matiere === mat.id);
+    const elSession = card.querySelector('.matiere-card__session');
+    if (elSession) {
+      if (derniereSession) {
+        elSession.innerHTML = `
+          <strong>${Utils.formaterDateCourte(derniereSession.date)}</strong>
+          — ${derniereSession.score_bonnes}/${derniereSession.nb_questions}
+          (${Math.round((derniereSession.score_bonnes / derniereSession.nb_questions) * 100)}%)
+        `;
+      } else {
+        elSession.innerHTML = '<span>Aucune session</span>';
+      }
+    }
+  }
+
+  /* ---- 4. POINTS FAIBLES ---- */
+  const listeFaibles = Storage.getPointsFaibles(50);
+  const elFaiblesList  = document.getElementById('faibles-list');
+  const elFaiblesEmpty = document.getElementById('faibles-empty');
+
+  if (listeFaibles.length === 0) {
+    /* Aucun point faible : afficher le message de succès */
+    if (elFaiblesList)  elFaiblesList.classList.add('hidden');
+    if (elFaiblesEmpty) elFaiblesEmpty.classList.remove('hidden');
+  } else {
+    if (elFaiblesEmpty) elFaiblesEmpty.classList.add('hidden');
+    if (elFaiblesList) {
+      /* Afficher jusqu'à 5 points faibles */
+      const top5 = listeFaibles.slice(0, 5);
+      elFaiblesList.innerHTML = top5.map(item => `
+        <div class="faible-item" role="listitem">
+          <span class="faible-item__matiere-dot faible-item__matiere-dot--${item.matiere.replace('physique-chimie','physique')}" aria-hidden="true"></span>
+          <div class="faible-item__info">
+            <p class="faible-item__chapitre">${_capitaliser(item.chapitre)}</p>
+            <p class="faible-item__matiere-label">${_labelMatiere(item.matiere)}</p>
+          </div>
+          <span class="faible-item__score">${item.score}%</span>
+          <button
+            class="faible-item__btn"
+            onclick="naviguer('matiere', { matiere: '${item.matiere}' })"
+            aria-label="Retravailler ${item.chapitre}"
+          >Retravailler</button>
+        </div>
+      `).join('');
+    }
+  }
+
+  /* ---- 5. BADGES ---- */
+  const badgesAvecEtat = Gamification.getBadgesAvecEtat();
+  const elBadgesList   = document.getElementById('badges-list');
+
+  if (elBadgesList) {
+    elBadgesList.innerHTML = badgesAvecEtat.map(badge => `
+      <div
+        class="badge-card${badge.debloque ? '' : ' badge-card--locked'}"
+        role="listitem"
+        aria-label="Badge ${badge.nom}${badge.debloque ? ' — débloqué' : ' — verrouillé'}"
+      >
+        <span class="badge-card__icon" aria-hidden="true">${badge.emoji}</span>
+        <span class="badge-card__nom">${badge.nom}</span>
+        <span class="badge-card__desc">${badge.description}</span>
+      </div>
+    `).join('');
+  }
+
+  /* ---- HELPERS LOCAUX ---- */
+  function _capitaliser(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).replace(/-/g, ' ');
+  }
+
+  function _labelMatiere(id) {
+    const labels = {
+      'maths':            'Maths',
+      'histoire-geo':     'Histoire-Géo',
+      'physique-chimie':  'Physique-Chimie',
+      'svt':              'SVT',
+    };
+    return labels[id] || id;
+  }
+
+})();
+</script>

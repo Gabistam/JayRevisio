@@ -1,0 +1,182 @@
+<!-- ================================================
+     profil.html — Study Jay
+     Vue profil : XP, badges, historique des sessions
+     ================================================ -->
+
+<div class="profil-page">
+
+  <!-- ---- EN-TÊTE PROFIL ---- -->
+  <div class="profil-header">
+    <div class="profil-avatar" aria-hidden="true">🎮</div>
+    <div class="profil-identite">
+      <h1 class="profil-niveau-nom" id="profil-niveau-nom">🪖 Recrue</h1>
+      <p class="profil-xp-total" id="profil-xp-total">0 XP</p>
+    </div>
+  </div>
+
+  <!-- ---- BARRE XP DÉTAILLÉE ---- -->
+  <div class="profil-xp-section card" aria-label="Progression XP vers le prochain niveau">
+    <div class="profil-xp-labels flex-between">
+      <span class="text-sm text-secondary" id="profil-xp-actuel">0 XP</span>
+      <span class="text-sm text-secondary" id="profil-xp-prochain">200 XP</span>
+    </div>
+    <div class="progress-bar" role="progressbar" id="profil-xp-bar"
+         aria-valuenow="0" aria-valuemin="0" aria-valuemax="200" aria-label="XP vers niveau suivant">
+      <div class="progress-bar__fill" id="profil-xp-fill"
+           style="width:0%; background: linear-gradient(90deg, var(--color-xp), #a855f7);"></div>
+    </div>
+    <p class="profil-xp-hint text-xs text-muted" id="profil-xp-hint">200 XP pour passer Soldat</p>
+  </div>
+
+  <!-- ---- STATS GLOBALES ---- -->
+  <section aria-labelledby="titre-stats-profil">
+    <h2 class="section-title" id="titre-stats-profil">
+      <span class="title-icon" aria-hidden="true">📊</span> Mes stats
+    </h2>
+    <div class="profil-stats-grid" role="list">
+      <div class="profil-stat-card card" role="listitem">
+        <span class="profil-stat-valeur font-mono" id="stat-streak">0🔥</span>
+        <span class="profil-stat-label text-sm text-secondary">Streak actuel</span>
+      </div>
+      <div class="profil-stat-card card" role="listitem">
+        <span class="profil-stat-valeur font-mono" id="stat-total-questions">0</span>
+        <span class="profil-stat-label text-sm text-secondary">Questions répondues</span>
+      </div>
+      <div class="profil-stat-card card" role="listitem">
+        <span class="profil-stat-valeur font-mono" id="stat-total-sessions">0</span>
+        <span class="profil-stat-label text-sm text-secondary">Sessions complètes</span>
+      </div>
+      <div class="profil-stat-card card" role="listitem">
+        <span class="profil-stat-valeur font-mono" id="stat-brevet-jours">—</span>
+        <span class="profil-stat-label text-sm text-secondary">Jours avant le Brevet</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---- BADGES ---- -->
+  <section aria-labelledby="titre-badges-profil" class="mt-8">
+    <h2 class="section-title" id="titre-badges-profil">
+      <span class="title-icon" aria-hidden="true">🏅</span> Mes badges
+    </h2>
+    <div class="profil-badges-grid" id="profil-badges-grid" role="list"
+         aria-label="Tous les badges">
+      <!-- injecté par JS -->
+    </div>
+  </section>
+
+  <!-- ---- HISTORIQUE ---- -->
+  <section aria-labelledby="titre-historique" class="mt-8">
+    <h2 class="section-title" id="titre-historique">
+      <span class="title-icon" aria-hidden="true">📋</span> Historique des sessions
+    </h2>
+    <div class="profil-historique" id="profil-historique" role="list">
+      <!-- injecté par JS -->
+    </div>
+  </section>
+
+  <!-- ---- RÉINITIALISATION (danger zone) ---- -->
+  <section class="profil-danger-zone mt-8" aria-labelledby="titre-reset">
+    <h2 class="section-title text-secondary" id="titre-reset" style="font-size:var(--text-sm);">
+      Zone de réinitialisation
+    </h2>
+    <button class="btn btn--secondary btn--sm" id="btn-reset-profil"
+            aria-label="Remettre à zéro toutes les données">
+      🗑️ Tout réinitialiser
+    </button>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  const profil     = Storage.getProfil();
+  const historique = Storage.getHistorique();
+
+  /* ---- XP & Niveau ---- */
+  const config    = Gamification.getNiveauConfig(profil.niveau);
+  const palier    = Gamification.getPalierSuivant(profil.xp);
+  const pct       = Gamification.getPctProgression(profil.xp);
+  const xpProchain = palier ? palier.xp_requis : profil.xp;
+
+  document.getElementById('profil-niveau-nom').textContent  = `${config.emoji} ${config.nom}`;
+  document.getElementById('profil-xp-total').textContent    = `${profil.xp} XP au total`;
+  document.getElementById('profil-xp-actuel').textContent   = `${profil.xp} XP`;
+  document.getElementById('profil-xp-prochain').textContent = palier ? `${xpProchain} XP` : 'Niveau MAX';
+  document.getElementById('profil-xp-fill').style.width     = `${pct}%`;
+  document.getElementById('profil-xp-bar').setAttribute('aria-valuenow', profil.xp);
+  document.getElementById('profil-xp-bar').setAttribute('aria-valuemax', xpProchain);
+
+  if (palier) {
+    const manquant = xpProchain - profil.xp;
+    const niveauSuiv = Gamification.getNiveauConfig(palier.niveau);
+    document.getElementById('profil-xp-hint').textContent =
+      `${manquant} XP pour passer ${niveauSuiv.nom}`;
+  } else {
+    document.getElementById('profil-xp-hint').textContent = 'Niveau maximum atteint ! 👑';
+  }
+
+  /* ---- Stats ---- */
+  const totalQuestions = historique.reduce((s, h) => s + (h.nb_questions || 0), 0);
+  document.getElementById('stat-streak').textContent          = `${profil.streak_jours || 0}🔥`;
+  document.getElementById('stat-total-questions').textContent = totalQuestions;
+  document.getElementById('stat-total-sessions').textContent  = historique.length;
+  document.getElementById('stat-brevet-jours').textContent    = Utils.joursAvant(profil.brevet_date || '2026-06-19');
+
+  /* ---- Badges ---- */
+  const badgesGrid  = document.getElementById('profil-badges-grid');
+  const tousLes     = Gamification.getBadgesAvecEtat();
+  badgesGrid.innerHTML = tousLes.map(b => `
+    <div class="profil-badge-item card${b.debloque ? '' : ' badge-card--locked'}"
+         role="listitem"
+         aria-label="${b.nom} — ${b.debloque ? 'débloqué' : 'verrouillé'}">
+      <span class="profil-badge-emoji" aria-hidden="true">${b.emoji}</span>
+      <span class="profil-badge-nom">${b.nom}</span>
+      <span class="profil-badge-desc text-xs text-muted">${b.description}</span>
+    </div>
+  `).join('');
+
+  /* ---- Historique ---- */
+  const elHistorique = document.getElementById('profil-historique');
+  if (historique.length === 0) {
+    elHistorique.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state__icon">📭</span>
+        <p class="empty-state__text">Aucune session pour l'instant.<br>Lance ton premier quiz !</p>
+      </div>`;
+  } else {
+    const LABELS = { 'maths':'📐 Maths','histoire-geo':'🗺️ Hist-Géo',
+                     'physique-chimie':'⚗️ Physique','svt':'🌿 SVT' };
+    elHistorique.innerHTML = historique.slice(0, 20).map(s => {
+      const pct = s.nb_questions > 0
+        ? Math.round((s.score_bonnes / s.nb_questions) * 100) : 0;
+      return `
+        <div class="historique-item card" role="listitem">
+          <div class="historique-item__left">
+            <span class="historique-item__matiere">${LABELS[s.matiere] || s.matiere}</span>
+            <span class="historique-item__chapitre text-xs text-muted">${s.chapitre || ''}</span>
+          </div>
+          <div class="historique-item__center">
+            <span class="historique-item__score font-mono">${s.score_bonnes}/${s.nb_questions}</span>
+            <span class="historique-item__pct text-xs ${pct >= 50 ? 'text-secondary' : ''}"
+                  style="color:${pct >= 80 ? 'var(--color-success)' : pct >= 50 ? 'var(--text-secondary)' : 'var(--color-error)'}">
+              ${pct}%
+            </span>
+          </div>
+          <div class="historique-item__right text-xs text-muted">
+            <span>+${s.xp_gagne || 0} XP</span>
+            <span>${Utils.formaterDateCourte(s.date)}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /* ---- Reset ---- */
+  document.getElementById('btn-reset-profil').addEventListener('click', () => {
+    if (confirm('Réinitialiser toutes tes données ? Cette action est irréversible.')) {
+      Storage.reset();
+      naviguer('dashboard');
+    }
+  });
+})();
+</script>

@@ -1,0 +1,104 @@
+<!-- ================================================
+     quiz.html — Study Jay
+     Vue quiz — injectée par le router SPA
+     Initialisée par QuizEngine (js/quiz-engine.js)
+     ================================================ -->
+
+<!-- ------------------------------------------------
+     1. HEADER DU QUIZ
+     ------------------------------------------------ -->
+<div class="quiz-header">
+  <button class="btn-retour" onclick="history.back()" aria-label="Retour">
+    ← Retour
+  </button>
+
+  <div class="quiz-info">
+    <span class="quiz-matiere-label" id="quiz-matiere-label">Maths</span>
+    <span class="quiz-progression-badge" id="quiz-progression" aria-live="polite" aria-label="Progression">
+      1 / 20
+    </span>
+  </div>
+
+  <!-- Barre XP de la session -->
+  <div class="quiz-xp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="XP session">
+    <div class="quiz-xp-bar__fill" id="quiz-xp-fill" style="width: 0%;"></div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------
+     2. ZONE CHRONO (cachée si pas défi chrono)
+     ------------------------------------------------ -->
+<div class="chrono-zone hidden" id="chrono-zone" role="timer" aria-label="Temps restant">
+  <div class="chrono-bar-wrapper">
+    <div class="chrono-bar" id="chrono-bar" style="width: 100%;"></div>
+  </div>
+  <span id="chrono-temps" aria-live="polite">60s</span>
+</div>
+
+<!-- ------------------------------------------------
+     3. ZONE QUESTION PRINCIPALE
+     Injectée dynamiquement par QuizEngine.demarrer()
+     ------------------------------------------------ -->
+<div id="quiz-zone" role="main" aria-live="polite" aria-label="Question en cours">
+  <!-- État de chargement initial -->
+  <div class="quiz-loading">
+    <div class="quiz-spinner" aria-hidden="true"></div>
+    <p>Chargement du quiz...</p>
+  </div>
+</div>
+
+<!-- ------------------------------------------------
+     4. SCRIPT D'INITIALISATION DU QUIZ
+     ------------------------------------------------ -->
+<script>
+(function () {
+  /* Récupérer les paramètres passés par le router */
+  const params = window.routerState ? window.routerState.params : {};
+
+  /* Sécurité : s'assurer que QuizEngine est disponible */
+  if (typeof window.QuizEngine === 'undefined') {
+    document.getElementById('quiz-zone').innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state__icon">😵</span>
+        <p class="empty-state__text">
+          Erreur : le moteur de quiz n'est pas chargé.<br/>
+          <button class="btn btn--secondary btn--sm mt-4" onclick="naviguer('dashboard')">
+            Retour à l'accueil
+          </button>
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  /* Mettre à jour le label matière dans le header */
+  const labelsMatiere = {
+    'maths':            '📐 Maths',
+    'histoire-geo':     '🗺️ Histoire-Géo',
+    'physique-chimie':  '⚗️ Physique-Chimie',
+    'svt':              '🌿 SVT',
+  };
+  const elLabel = document.getElementById('quiz-matiere-label');
+  if (elLabel && params.matiere) {
+    elLabel.textContent = labelsMatiere[params.matiere] || params.matiere;
+  }
+
+  /* Initialiser (async → fetch JSON) puis démarrer */
+  window.QuizEngine.init(params).then(() => {
+    window.QuizEngine.demarrer();
+  }).catch(err => {
+    console.error('[Quiz] Erreur init :', err);
+    document.getElementById('quiz-zone').innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state__icon">😵</span>
+        <p class="empty-state__text">
+          Impossible de charger les questions.<br/>
+          <button class="btn btn--secondary btn--sm mt-4" onclick="naviguer('dashboard')">
+            Retour à l'accueil
+          </button>
+        </p>
+      </div>
+    `;
+  });
+})();
+</script>
