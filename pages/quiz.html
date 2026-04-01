@@ -8,7 +8,7 @@
      1. HEADER DU QUIZ
      ------------------------------------------------ -->
 <div class="quiz-header">
-  <button class="btn-retour" onclick="history.back()" aria-label="Retour">
+  <button class="btn-retour" onclick="naviguer('matiere', { matiere: (window.routerState && window.routerState.params && window.routerState.params.matiere) || 'maths' })" aria-label="Retour">
     ← Retour
   </button>
 

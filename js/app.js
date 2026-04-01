@@ -64,6 +64,21 @@ function chargerCSS(href) {
 }
 
 /* ------------------------------------------------
+   UTILITAIRE : ré-exécuter les <script> injectés via innerHTML
+   (innerHTML ne les exécute pas nativement — comportement navigateur)
+   ------------------------------------------------ */
+function reExecScripts(container) {
+  container.querySelectorAll('script').forEach(ancien => {
+    const nouveau = document.createElement('script');
+    // Copier les attributs (type, src, etc.)
+    Array.from(ancien.attributes).forEach(attr => nouveau.setAttribute(attr.name, attr.value));
+    // Copier le contenu inline
+    nouveau.textContent = ancien.textContent;
+    ancien.parentNode.replaceChild(nouveau, ancien);
+  });
+}
+
+/* ------------------------------------------------
    UTILITAIRE : récupérer le HTML d'une vue
    ------------------------------------------------ */
 async function chargerHTML(url) {
@@ -133,12 +148,16 @@ async function afficherVue(vue, params = {}) {
     ]);
 
     /* Injecter le HTML avec animation d'entrée */
+    main.style.transition = 'none';
     main.style.opacity = '0';
     main.innerHTML = html;
-    requestAnimationFrame(() => {
+    /* Ré-exécuter les scripts injectés (innerHTML ne le fait pas nativement) */
+    reExecScripts(main);
+    /* Double rAF pour forcer un reflow avant de lancer la transition */
+    requestAnimationFrame(() => requestAnimationFrame(() => {
       main.style.transition = 'opacity 180ms ease';
       main.style.opacity = '1';
-    });
+    }));
 
     /* Mettre à jour le titre de la page */
     document.title = config.title;

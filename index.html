@@ -92,11 +92,13 @@
   <!-- =============================================
        ZONE PRINCIPALE — les vues SPA sont injectées ici
   ============================================= -->
+  <!-- Loader de navigation (hors de app-main pour survivre aux injections) -->
+  <div class="view-loader" id="view-loader" aria-live="assertive" aria-label="Chargement en cours">
+    <div class="spinner" aria-hidden="true"></div>
+  </div>
+
   <main class="app-main" id="app-main" role="main">
     <!-- Le contenu HTML de chaque page est chargé ici par le router -->
-    <div class="view-loader" id="view-loader" aria-live="assertive" aria-label="Chargement en cours">
-      <div class="spinner" aria-hidden="true"></div>
-    </div>
   </main>
 
   <!-- =============================================

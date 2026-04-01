@@ -83,7 +83,7 @@ const BADGES_CONFIG = [
 /* ------------------------------------------------
    ÉTAT INTERNE DU SYSTÈME DE GAMIFICATION
    ------------------------------------------------ */
-const _etat = {
+const _etatGamification = {
   combo: 0,   /* combo de bonnes réponses consécutives */
   combo_max: 0,   /* record de combo dans la session */
   xp_session: 0,   /* XP accumulé dans la session courante */
@@ -129,7 +129,7 @@ const Gamification = {
     this._mettreAJourHeader();
 
     /* Accumuler pour le résumé de session */
-    _etat.xp_session += montant;
+    _etatGamification.xp_session += montant;
 
     /* Toast XP flottant */
     this._toastXP(montant, raison);
@@ -167,40 +167,40 @@ const Gamification = {
    * @returns {{ combo: number, bonus_xp: number }}
    */
   bonneReponse() {
-    _etat.combo++;
-    if (_etat.combo > _etat.combo_max) _etat.combo_max = _etat.combo;
+    _etatGamification.combo++;
+    if (_etatGamification.combo > _etatGamification.combo_max) _etatGamification.combo_max = _etatGamification.combo;
 
     let bonus = 0;
-    if (_etat.combo > 0 && _etat.combo % 3 === 0) {
+    if (_etatGamification.combo > 0 && _etatGamification.combo % 3 === 0) {
       /* Bonus combo tous les 3 consécutifs */
       bonus = 15;
-      this._toast(`🔥 Combo x${_etat.combo} ! +${bonus} XP bonus`, 'xp');
+      this._toast(`🔥 Combo x${_etatGamification.combo} ! +${bonus} XP bonus`, 'xp');
       this.ajouterXP(bonus, '');
     }
 
-    return { combo: _etat.combo, bonus_xp: bonus };
+    return { combo: _etatGamification.combo, bonus_xp: bonus };
   },
 
   /**
    * Enregistre une mauvaise réponse — remet le combo à zéro.
    */
   mauvaiseReponse() {
-    _etat.combo = 0;
+    _etatGamification.combo = 0;
   },
 
-  getCombo() { return _etat.combo; },
-  getComboMax() { return _etat.combo_max; },
+  getCombo() { return _etatGamification.combo; },
+  getComboMax() { return _etatGamification.combo_max; },
 
   /**
    * Réinitialise l'état de session (à appeler en début de quiz).
    */
   reinitSession() {
-    _etat.combo = 0;
-    _etat.combo_max = 0;
-    _etat.xp_session = 0;
+    _etatGamification.combo = 0;
+    _etatGamification.combo_max = 0;
+    _etatGamification.xp_session = 0;
   },
 
-  getXPSession() { return _etat.xp_session; },
+  getXPSession() { return _etatGamification.xp_session; },
 
   /* ---- NIVEAUX ---- */
 
@@ -275,7 +275,7 @@ const Gamification = {
     const totalQuestions = historique.reduce((sum, s) => sum + (s.nb_questions || 0), 0);
 
     const statsGlobales = {
-      combo_max: statsSession.combo_max ?? _etat.combo_max,
+      combo_max: statsSession.combo_max ?? _etatGamification.combo_max,
       sessions_svt: sessionsSvt,
       session_parfaite: statsSession.parfaite ?? false,
       defis_chrono_gagnes: defisChrono,

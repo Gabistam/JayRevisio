@@ -204,8 +204,21 @@ const QuizEngine = {
   _evaluerReponse(q, reponse) {
     switch (q.type) {
 
-      case 'qcm':
-        return String(reponse).trim() === String(q.reponse).trim();
+      case 'qcm': {
+        const repUser = String(reponse).trim();
+        const repCorr = String(q.reponse).trim();
+        if (repUser === repCorr) return true;
+        /* Cas où reponse = lettre seule ("B") et choix = "B. texte..." */
+        if (/^[A-D]$/.test(repCorr)) {
+          return repUser.startsWith(repCorr + '.');
+        }
+        /* Cas inverse : reponse = texte complet, user a cliqué sur lettre seule */
+        if (/^[A-D]\./.test(repUser)) {
+          const lettre = repUser[0];
+          return repCorr === lettre;
+        }
+        return false;
+      }
 
       case 'vrai_faux':
         /* reponse est un booléen ou une string 'true'/'false' */
@@ -241,10 +254,10 @@ const QuizEngine = {
       case 'association': {
         /* reponse : tableau de { terme_id, def_id } */
         const paires = q.paires || [];
-        if (!Array.isArray(reponse)) return false;
+        if (!Array.isArray(reponse) || reponse.length !== paires.length) return false;
         return paires.every((paire, i) => {
           const rep = reponse.find(r => r.terme_id === i);
-          return rep && rep.def_id === i;
+          return rep !== undefined && rep.def_id === i;
         });
       }
 
@@ -994,9 +1007,16 @@ const QuizEngine = {
       case 'calcul':
         messageErreur = `La bonne réponse est <strong>${q.reponse}${q.unite ? ' ' + q.unite : ''}</strong>.`;
         break;
-      case 'qcm':
-        messageErreur = `La bonne réponse est <strong>${this._escHtml(String(q.reponse))}</strong>.`;
+      case 'qcm': {
+        /* Si reponse = lettre seule, chercher le texte complet dans les choix */
+        let repTexte = String(q.reponse);
+        if (/^[A-D]$/.test(repTexte) && q.choix) {
+          const trouve = q.choix.find(c => c.startsWith(repTexte + '.'));
+          if (trouve) repTexte = trouve;
+        }
+        messageErreur = `La bonne réponse est <strong>${this._escHtml(repTexte)}</strong>.`;
         break;
+      }
       case 'vrai_faux':
         messageErreur = `La réponse est <strong>${q.reponse ? 'Vrai' : 'Faux'}</strong>.`;
         break;
@@ -1049,11 +1069,18 @@ const QuizEngine = {
   /* Coloration des boutons QCM/VF après réponse */
   _colorierChoix(q, reponse, correct) {
     if (q.type === 'qcm') {
+      const repCorr = String(q.reponse).trim();
       document.querySelectorAll('.choix-btn').forEach(btn => {
-        if (btn.dataset.valeur === String(q.reponse)) {
+        const val = btn.dataset.valeur;
+        /* Correspondance directe ou par lettre */
+        const estCorrect = val === repCorr
+          || (/^[A-D]$/.test(repCorr) && val.startsWith(repCorr + '.'));
+        const estSelectionne = val === String(reponse);
+
+        if (estCorrect) {
           btn.style.borderColor = 'var(--color-success)';
           btn.style.background  = 'rgba(34, 197, 94, 0.1)';
-        } else if (btn.dataset.valeur === String(reponse) && !correct) {
+        } else if (estSelectionne && !correct) {
           btn.style.borderColor = 'var(--color-error)';
           btn.style.background  = 'rgba(239, 68, 68, 0.1)';
         }
