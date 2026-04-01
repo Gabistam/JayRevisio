@@ -6,7 +6,12 @@
       "Bash(python3:*)",
       "Bash(python -c ':*)",
       "Bash(ls -la *.html *.json)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(npx create-next-app@latest app-v2 --typescript=false --tailwind=false --eslint=false --app --src-dir=false --import-alias=\"@/*\" --use-npm)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(cp -r C:/Users/gabistam/Desktop/DevPerso/JayRevisio/css C:/Users/gabistam/Desktop/DevPerso/JayRevisio/app-v2/public/css)",
+      "Bash(cp -r C:/Users/gabistam/Desktop/DevPerso/JayRevisio/data C:/Users/gabistam/Desktop/DevPerso/JayRevisio/app-v2/public/data)"
     ]
   }
 }
