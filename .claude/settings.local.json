@@ -4,7 +4,8 @@
       "Bash(wc -l C:/Users/gabistam/Desktop/DevPerso/JayRevisio/js/*.js)",
       "Bash(node:*)",
       "Bash(python3:*)",
-      "Bash(python -c ':*)"
+      "Bash(python -c ':*)",
+      "Bash(ls -la *.html *.json)"
     ]
   }
 }

@@ -1159,16 +1159,37 @@ const QuizEngine = {
     const pct    = stats.nb_questions > 0
       ? Math.round((stats.score_bonnes / stats.nb_questions) * 100)
       : 0;
-    const emoji  = pct === 100 ? '🏆' : pct >= 80 ? '🔥' : pct >= 50 ? '😊' : '😅';
-    const msg    = pct === 100 ? 'Session parfaite !'
-                 : pct >= 80  ? 'Excellent travail !'
-                 : pct >= 50  ? 'Bonne session, continue !'
-                               : 'Continue de t\'entraîner !';
+
+    /* Défi du jour : résultat spécial */
+    const estDefi = config.defi === '1';
+
+    const emoji  = estDefi
+      ? (pct === 100 ? '⚡' : '💪')
+      : (pct === 100 ? '🏆' : pct >= 80 ? '🔥' : pct >= 50 ? '😊' : '😅');
+    const titre  = estDefi ? 'Défi du jour relevé !' : 'Session terminée !';
+    const msg    = estDefi
+      ? (pct === 100 ? '+50 XP bonus récoltés ! 🎉' : 'Tu as relevé le défi, continue comme ça !')
+      : (pct === 100 ? 'Session parfaite !'
+         : pct >= 80  ? 'Excellent travail !'
+         : pct >= 50  ? 'Bonne session, continue !'
+                       : 'Continue de t\'entraîner !');
+
+    const xpDefiBonus = estDefi ? `<div class="stat-card" role="listitem">
+              <span class="stat-card__valeur" style="color:var(--color-warning)">+50</span>
+              <span class="stat-card__label">Bonus défi</span>
+            </div>` : '';
+
+    const boutonRejouer = estDefi ? '' : `
+          <button
+            class="btn btn--primary"
+            onclick="window.QuizEngine.init(window.routerState.params).then(() => window.QuizEngine.demarrer())"
+            aria-label="Rejouer"
+          >🔄 Rejouer</button>`;
 
     zone.innerHTML = `
       <div id="resultats" role="main">
         <p class="resultats-sous-titre" style="font-size:3rem;text-align:center;">${emoji}</p>
-        <h2 class="resultats-titre" style="text-align:center;">Session terminée !</h2>
+        <h2 class="resultats-titre" style="text-align:center;">${titre}</h2>
         <p class="resultats-sous-titre" style="text-align:center;">${msg}</p>
 
         <div class="resultats-score" aria-label="Score ${stats.score_bonnes} sur ${stats.nb_questions}">
@@ -1188,22 +1209,19 @@ const QuizEngine = {
             <span class="stat-card__valeur">${stats.combo_max}</span>
             <span class="stat-card__label">Combo max</span>
           </div>
+          ${xpDefiBonus}
         </div>
 
         <div class="resultats-actions">
-          <button
-            class="btn btn--primary"
-            onclick="window.QuizEngine.init(window.routerState.params).then(() => window.QuizEngine.demarrer())"
-            aria-label="Rejouer"
-          >🔄 Rejouer</button>
+          ${boutonRejouer}
           <button
             class="btn btn--secondary"
             onclick="naviguer('matiere', { matiere: '${matiere}' })"
           >← Retour matière</button>
           <button
-            class="btn btn--ghost"
+            class="btn btn--${estDefi ? 'primary' : 'ghost'}"
             onclick="naviguer('dashboard')"
-          >Accueil</button>
+          >🏠 Accueil</button>
         </div>
       </div>
     `;
