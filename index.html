@@ -22,17 +22,21 @@
   <!-- CSS global (chargé en premier — contient les variables) -->
   <link rel="stylesheet" href="css/main.css" />
 
-  <!-- GitHub Pages SPA redirect handler -->
+  <!-- GitHub Pages SPA routing: handle redirect from 404.html -->
   <script>
     (function () {
-      /* Récupère le chemin encodé par 404.html */
       var redirect = sessionStorage.getItem('redirect');
-      if (redirect) {
-        sessionStorage.removeItem('redirect');
+      if (!redirect) return;
+      sessionStorage.removeItem('redirect');
+      try {
         var url = new URL(redirect);
-        var path = url.searchParams.get('/') || url.hash.replace('#', '');
-        if (path) window.location.hash = path;
-      }
+        /* Le path après la racine du repo devient le hash */
+        var segments = url.pathname.split('/').filter(Boolean);
+        /* Sur GitHub Pages le premier segment est le repo name — on l'ignore */
+        if (segments.length > 1) segments.shift();
+        var hash = segments.join('/') + url.search;
+        if (hash) window.location.hash = hash;
+      } catch (e) { /* ignore */ }
     })();
   </script>
 

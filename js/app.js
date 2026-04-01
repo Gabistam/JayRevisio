@@ -132,8 +132,13 @@ async function afficherVue(vue, params = {}) {
       chargerCSS(config.css),
     ]);
 
-    /* Injecter le HTML */
+    /* Injecter le HTML avec animation d'entrée */
+    main.style.opacity = '0';
     main.innerHTML = html;
+    requestAnimationFrame(() => {
+      main.style.transition = 'opacity 180ms ease';
+      main.style.opacity = '1';
+    });
 
     /* Mettre à jour le titre de la page */
     document.title = config.title;

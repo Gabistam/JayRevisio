@@ -3,33 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Study Jay — Redirection</title>
+  <title>Study Jay</title>
   <script>
     /* ================================================
-       404.html — GitHub Pages SPA fallback
-       Redirige toutes les routes vers index.html
-       en préservant le chemin dans le hash.
-       Technique standard pour les SPA sur GitHub Pages.
+       404.html — GitHub Pages SPA routing fallback
+       Technique : stocker l'URL complète dans sessionStorage,
+       puis rediriger vers index.html qui la lit.
        ================================================ */
-    (function () {
-      var l = window.location;
-      /* Ne pas rediriger si on est déjà sur index.html */
-      if (l.pathname === '/') return;
-
-      /* Construire l'URL index.html + hash depuis le chemin */
-      var path = l.pathname.replace(/\/$/, '');
-      var repo = path.split('/')[1] || '';
-
-      /* Encoder le chemin en fragment pour que le router SPA le lise */
-      var hash = path.slice(repo ? repo.length + 1 : 0) || '/';
-      var redirect = l.origin + '/' + repo + '/?/' + hash.slice(1) + l.search;
-
-      /* Remplacer l'historique pour ne pas casser le bouton retour */
-      l.replace(redirect);
-    })();
+    sessionStorage.setItem('redirect', location.href);
+    location.replace(
+      location.href
+        .replace(location.pathname + location.search, '/')
+    );
   </script>
 </head>
-<body>
-  <p>Redirection en cours...</p>
-</body>
+<body></body>
 </html>
