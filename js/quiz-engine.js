@@ -78,6 +78,13 @@ const QuizEngine = {
   _preparerQuestions(toutes, config) {
     let liste = [...toutes];
 
+    /* Mode défi du jour : une seule question ciblée */
+    if (config && config.defi === '1' && config.question_id) {
+      const qid = parseInt(config.question_id, 10);
+      const cible = liste.find(q => q.id === qid);
+      return cible ? [cible] : liste.slice(0, 1);
+    }
+
     /* Filtre par chapitre */
     if (config && config.chapitre) {
       const chFiltres = Array.isArray(config.chapitre)
@@ -1124,6 +1131,15 @@ const QuizEngine = {
         duree_s:      dureeS,
         defi_gagne:   config.mode === 'chrono' && stats.parfait,
       });
+
+      /* Marquer le défi du jour comme complété */
+      if (config.defi === '1') {
+        const xpDefi = stats.xp_gagne || 50;
+        Storage.completerDefi(xpDefi);
+        if (window.Gamification) {
+          Gamification.ajouterXP(50, 'Défi du jour relevé ! ⚡');
+        }
+      }
 
       Storage.enregistrerSession();
     }

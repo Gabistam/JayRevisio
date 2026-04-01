@@ -326,6 +326,43 @@ const Storage = {
     return resultats.sort((a, b) => a.score - b.score);
   },
 
+  /* ---- DÉFI DU JOUR ---- */
+
+  /**
+   * Retourne l'état du défi du jour.
+   * Structure : { date, question_id, matiere, complete, xp_gagne }
+   */
+  getDefiDuJour() {
+    return this._cache.defi_du_jour || null;
+  },
+
+  /**
+   * Initialise le défi du jour pour aujourd'hui (si pas déjà fait).
+   * @param {string} matiere
+   * @param {number} question_id
+   */
+  setDefiDuJour(matiere, question_id) {
+    this._cache.defi_du_jour = {
+      date: Utils.dateAujourdhui(),
+      matiere,
+      question_id,
+      complete: false,
+      xp_gagne: 0,
+    };
+    this._sauvegarder();
+  },
+
+  /**
+   * Marque le défi du jour comme complété.
+   * @param {number} xp_gagne
+   */
+  completerDefi(xp_gagne) {
+    if (!this._cache.defi_du_jour) return;
+    this._cache.defi_du_jour.complete = true;
+    this._cache.defi_du_jour.xp_gagne = xp_gagne;
+    this._sauvegarder();
+  },
+
   /* ---- RESET (debug) ---- */
 
   /**
